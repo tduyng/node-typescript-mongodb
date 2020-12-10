@@ -34,13 +34,13 @@
     "outDir": "./build",
     "allowJs": true,
     "noEmit": false,
-    "baseUrl": "."
+    "baseUrl": "./"
   },
   "include": [
-    "./src/**/*"
+    "src"
   ],
   "exclude": [
     "node_modules",
-    "tests"
+    "test"
   ]
 }
