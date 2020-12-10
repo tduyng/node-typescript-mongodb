@@ -34,7 +34,7 @@
     "outDir": "./build",
     "allowJs": true,
     "noEmit": false,
-    "baseUrl": "./"
+    "baseUrl": "."
   },
   "include": [
     "src"
