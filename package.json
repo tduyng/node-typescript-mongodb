@@ -2,11 +2,11 @@
   "name": "nodets-restapi-starter",
   "version": "1.0.0",
   "description": "Node Typescript starter",
-  "main": "src/app.ts",
+  "main": "src/server.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon src/app.ts",
-    "start": "nodemon src/app.ts",
+    "dev": "nodemon",
+    "start": "nodemon",
     "test": "jest",
     "lint": "eslint --ext js,jsx,ts,tsx src/",
     "lint:fix": "eslint --fix --ext js,jsx,ts,tsx src/",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/santiq/bulletproof-nodejs.git"
+    "url": "git+https://github.com/tienduy-nguyen/nodets-restapi-starter.git"
   },
   "keywords": [
     "nodejs",
