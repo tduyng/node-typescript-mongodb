@@ -1,10 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { RequestUser } from 'src/@types/user';
 import { config } from 'src/config';
 
-interface RequestUser extends Request {
-  user?: any;
-}
 export const auth = (
   req: RequestUser,
   res: Response,

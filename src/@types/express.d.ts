@@ -10,3 +10,9 @@ declare global {
     export type UserModel = Model<IUser & Document>;
   }
 }
+
+interface ExpressError {
+  status?: number;
+  name?: string;
+  message?: string;
+}

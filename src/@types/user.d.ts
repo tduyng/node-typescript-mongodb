@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 interface IUser {
   _id: string;
   name: string;
@@ -9,4 +11,8 @@ interface IUserInputDTO {
   name: string;
   email: string;
   password: string;
+}
+
+interface RequestUser extends Request {
+  user?: any;
 }

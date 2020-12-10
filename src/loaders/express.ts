@@ -1,10 +1,10 @@
-import express from 'express';
-import bodyParser from 'body-parser';
+import express, { Request, Response, NextFunction, Application } from 'express';
 import cors from 'cors';
-// import routes from '../api';
+import { routes } from 'src/routes';
 import { config } from 'src/config';
+import { ExpressError } from 'src/@types/express';
 
-export const expressLoader = ({ app }: { app: express.Application }) => {
+export const expressLoader = (app: Application) => {
   /**
    * Health Check endpoints
    * @TODO Explain why they are here
@@ -32,11 +32,10 @@ export const expressLoader = ({ app }: { app: express.Application }) => {
   // "Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it."
   // Maybe not needed anymore ?
   app.use(require('method-override')());
+  app.use(express.json());
 
-  // Middleware that transforms the raw string of req.body into json
-  app.use(bodyParser.json());
   // Load API routes
-  // app.use(config.api.prefix, routes());
+  app.use(config.api.prefix, routes());
 
   /// catch 404 and forward to error handler
   app.use((req, res, next) => {
@@ -46,21 +45,25 @@ export const expressLoader = ({ app }: { app: express.Application }) => {
   });
 
   /// error handlers
-  app.use((err, req, res, next) => {
-    /**
-     * Handle 401 thrown by express-jwt library
-     */
-    if (err.name === 'UnauthorizedError') {
-      return res.status(err.status).send({ message: err.message }).end();
-    }
-    return next(err);
-  });
-  app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.json({
-      errors: {
-        message: err.message,
-      },
-    });
-  });
+  app.use(
+    (err: ExpressError, req: Request, res: Response, next: NextFunction) => {
+      /**
+       * Handle 401 thrown by express-jwt library
+       */
+      if (err.name === 'UnauthorizedError') {
+        return res.status(err.status).send({ message: err.message }).end();
+      }
+      return next(err);
+    },
+  );
+  app.use(
+    (err: ExpressError, req: Request, res: Response, next: NextFunction) => {
+      res.status(err.status || 500);
+      res.json({
+        errors: {
+          message: err.message,
+        },
+      });
+    },
+  );
 };
