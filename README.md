@@ -1,2 +1,3 @@
-# nodejs-ts-restapi-starter
-Nodejs Typescript Starter for RESTFul API
+# Node Typescript starter for RESTFul API Project
+
+
