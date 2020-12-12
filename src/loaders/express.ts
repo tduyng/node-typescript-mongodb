@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
+
 import cors from 'cors';
 import { routes } from 'src/routes';
 import { config } from 'src/config';

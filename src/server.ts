@@ -23,4 +23,5 @@ const startServer = async () => {
     });
 };
 
+console.log('Hi there!');
 startServer();

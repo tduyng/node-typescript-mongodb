@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { RequestUser } from 'src/@types/user';
+import { RequestUser } from 'src/@types/users';
 import { config } from 'src/config';
 
 export const auth = (
