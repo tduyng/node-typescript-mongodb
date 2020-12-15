@@ -1,13 +1,16 @@
 module.exports = {
-  parser: "@typescript-eslint/parser", // Specifies the ESLint parser
+  parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   parserOptions: {
     ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
-    sourceType: "module", // Allows for the use of imports
+    sourceType: 'module', // Allows for the use of imports
   },
-  extends: [
-    "plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
-  ],
-  rules: {
-    "@typescript-eslint/no-var-requires": "off",
-  },
+  //extends: [
+  //'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+  //],
+  //rules: {
+  //'@typescript-eslint/no-var-requires': 'off',
+  //'@typescript-eslint/explicit-function-return-type': {
+  //allowExpressions: true,
+  //},
+  //},
 };
