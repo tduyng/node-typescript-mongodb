@@ -6,12 +6,12 @@ interface IUser {
   email: string;
   password: string;
 }
-interface IUserInputDTO {
+interface IUserInput {
   username?: string;
   email?: string;
   password: string;
 }
 
 interface RequestUser extends Request {
-  user?: IUserInputDTO;
+  user?: IUserInput;
 }

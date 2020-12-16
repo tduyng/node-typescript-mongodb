@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { IUser } from 'src/@types/users';
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
@@ -36,4 +37,7 @@ UserSchema.path('username').validate(function (username) {
   return usernameRegex.test(username.text); // Assuming username has a text attribute
 }, 'User field cannot be empty.');
 
-export const Users = mongoose.model('user', UserSchema);
+export const UserModel = mongoose.model<IUser & mongoose.Document>(
+  'user',
+  UserSchema,
+);
