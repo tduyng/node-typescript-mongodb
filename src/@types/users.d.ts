@@ -1,12 +1,13 @@
 import { Request } from 'express';
 
 interface IUser {
-  _id: string;
+  id: string;
   username: string;
   email: string;
   password: string;
 }
 interface IUserInput {
+  id?: string;
   username?: string;
   email?: string;
   password: string;
