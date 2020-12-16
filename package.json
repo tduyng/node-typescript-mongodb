@@ -28,6 +28,7 @@
   "author": "td",
   "license": "MIT",
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^8.5.0",
     "agenda": "^3.1.0",
     "agendash": "^1.0.0",
