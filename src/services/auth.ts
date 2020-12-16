@@ -11,8 +11,14 @@ import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
+interface IAuthService {
+  getUser: (id: string) => Promise<IUser>;
+  loginUser: (userInput: IUserInput) => Promise<any>;
+  registerUser: (userInput: IUserInput) => Promise<any>;
+}
+
 @Service()
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(
     @Inject('userModel')
     private userModel: mongoose.Model<IUser & mongoose.Document>,
@@ -32,21 +38,17 @@ export class AuthService {
     }
   }
 
-  public async loginUser(Req: RequestUser) {
-    const userReq: IUserInput = Req.user; // get user from request
-    if (!userReq) {
-      throw new Error('Error login user,');
-    }
-    // Get user from db
-    const user =
-      (await this.userModel.findOne({ username: userReq.username })) ||
-      (await this.userModel.findOne({ email: userReq.email }));
-    if (!user) {
-      throw new Error('Invalid  credentials');
-    }
-    // Check password
+  public async loginUser(userInput: IUserInput) {
     try {
-      const isMatch = await bcrypt.compare(userReq.password, user.password);
+      // Get user from db
+      const user =
+        (await this.userModel.findOne({ username: userInput.username })) ||
+        (await this.userModel.findOne({ email: userInput.email }));
+      if (!user) {
+        throw new Error('Invalid  credentials');
+      }
+      // Check password
+      const isMatch = await bcrypt.compare(userInput.password, user.password);
       if (!isMatch) {
         throw new Error('Invalid credentials');
       }
