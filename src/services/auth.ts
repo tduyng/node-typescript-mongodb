@@ -30,16 +30,19 @@ export class AuthService {
   }
 
   public async loginUser(Req: RequestUser) {
-    const userReq: IUserInput = Req.user;
+    const userReq: IUserInput = Req.user; // get user from request
     if (!userReq) {
       throw new Error('Error login user,');
     }
+    // Get user from db
     const user =
       (await this.userModel.findOne({ username: userReq.username })) ||
       (await this.userModel.findOne({ email: userReq.email }));
     if (!user) {
       throw new Error('Invalid  credentials');
     }
+
+    // Check password
     try {
       const isMatch = await bcrypt.compare(userReq.password, user.password);
       if (!isMatch) {
