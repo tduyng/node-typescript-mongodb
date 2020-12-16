@@ -28,10 +28,10 @@ export const authRoutes = (appRouter: Router) => {
     },
   );
 
-  // @POST '/auth/signin'
+  // @POST '/auth'
   // @DES Login user
   router.post(
-    '/login',
+    '/',
     [
       check('username', 'Username is required').not().isEmpty(),
       check('password', 'Please enter your password').not().isEmpty(),
@@ -52,10 +52,10 @@ export const authRoutes = (appRouter: Router) => {
     },
   );
 
-  // @POST '/auth/signup'
+  // @POST '/auth/users'
   // @DES Register user
   router.post(
-    '/signup',
+    '/users',
     // Using express-validator to check form input
     [
       check('username', 'Username is required').not().isEmpty(),
