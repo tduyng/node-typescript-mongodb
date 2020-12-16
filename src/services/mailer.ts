@@ -1,10 +1,12 @@
 import { IUser } from 'src/@types/users';
 import { Service, Inject } from 'typedi';
+import { Logger } from 'winston';
+import { Container } from 'typedi';
 
 @Service()
 export class MailerService {
   constructor(@Inject('emailClient') private emailClient) {}
-
+  Logger: Logger = Container.get('logger');
   public async SendWelcomeEmail(email: string) {
     /*
      * @TODO Call Mailchip/ Sendgrid or whaterver mail service
@@ -13,11 +15,12 @@ export class MailerService {
     // Add example for sending mail from mailgun
     const data = {
       from: 'Excited User <me@sample.mailgun.org>',
-      to: 'tienduy@gmail.com',
+      to: email,
       subject: 'Hello',
       text: 'Testing from Mailgun awesome!',
     };
     this.emailClient.messages().send(data);
+
     return { delivered: 1, status: 'ok' };
   }
 

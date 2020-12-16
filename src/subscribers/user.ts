@@ -1,7 +1,9 @@
 import { Container } from 'typedi';
-import { EvenSubscriber, On } from 'event-dispatch';
+import { EventSubscriber, On } from 'event-dispatch';
 import mongoose from 'mongoose';
 import { Logger } from 'winston';
+import { AppEvents } from './event';
+import { IUser } from 'src/@types/users';
 
 @EventSubscriber()
 export default class UserSubscriber {
@@ -15,7 +17,7 @@ export default class UserSubscriber {
    * Use another approach like emit events to a queue (rabbitmq/aws sqs),
    * then save the latest in Redis/Memcache or something similar
    */
-  @On(events.user.signIn)
+  @On(AppEvents.user.signIn)
   public onUserSignIn({ _id }: Partial<IUser>) {
     const Logger: Logger = Container.get('logger');
 
@@ -26,15 +28,15 @@ export default class UserSubscriber {
 
       UserModel.update({ _id }, { $set: { lastLogin: new Date() } });
     } catch (e) {
-      Logger.error(`🔥 Error on event ${events.user.signIn}: %o`, e);
+      Logger.error(`🔥 Error on event ${AppEvents.user.signIn}: %o`, e);
 
       // Throw the error so the process die (check src/app.ts)
       throw e;
     }
   }
 
-  @On(events.user.signUp)
-  public onUserSignUp({ name, email, _id }: Partial<IUser>) {
+  @On(AppEvents.user.signUp)
+  public onUserSignUp({ username, email }: Partial<IUser>) {
     const Logger: Logger = Container.get('logger');
 
     try {
@@ -47,7 +49,7 @@ export default class UserSubscriber {
       // Start your email sequence or whatever
       // MailService.startSequence('user.welcome', { email, name })
     } catch (e) {
-      Logger.error(`🔥 Error on event ${events.user.signUp}: %o`, e);
+      Logger.error(`🔥 Error on event ${AppEvents.user.signUp}: %o`, e);
 
       // Throw the error so the process dies (check src/app.ts)
       throw e;

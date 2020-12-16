@@ -1,6 +1,9 @@
-export const EventSubscriber = {
+const AppEvents = {
   user: {
-    sigup: 'onUserSignUp',
+    signUp: 'onUserSignUp',
     signIn: 'onUserSignIn',
   },
 };
+export { AppEvents };
+
+export default AppEvents;
