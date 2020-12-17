@@ -10,6 +10,7 @@ import {
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import Logger from 'winston';
 
 interface IAuthService {
   getUser: (id: string) => Promise<IUser>;
@@ -32,8 +33,10 @@ export class AuthService implements IAuthService {
   public async getUser(id: string): Promise<IUser> {
     try {
       const user = await this.userModel.findById(id).select('-password');
+      this.logger.info('Succes getUser');
       return user;
     } catch (error) {
+      this.logger.error(`Error getUser: ${error.message}`);
       throw new Error('Can not get user!');
     }
   }
@@ -45,11 +48,13 @@ export class AuthService implements IAuthService {
         (await this.userModel.findOne({ username: userInput.username })) ||
         (await this.userModel.findOne({ email: userInput.email }));
       if (!user) {
+        this.logger.debug('Warning loginUser: InValid credentials');
         throw new Error('Invalid  credentials');
       }
       // Check password
       const isMatch = await bcrypt.compare(userInput.password, user.password);
       if (!isMatch) {
+        this.logger.debug('Warning loginUser: InValid credentials');
         throw new Error('Invalid credentials');
       }
 
@@ -66,9 +71,11 @@ export class AuthService implements IAuthService {
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user,
         });
+        this.logger.info('Success loginUser');
         return token;
       });
     } catch (error) {
+      this.logger.error(`Error loginUser: ${error.message}`);
       throw new Error('Error login user!');
     }
   }
@@ -81,6 +88,7 @@ export class AuthService implements IAuthService {
         (await this.userModel.findOne({ email }));
 
       if (user) {
+        this.logger.debug('Warning registerUser: User existed already');
         throw new Error('User existed already');
       }
       // Encrypting password
@@ -104,12 +112,14 @@ export class AuthService implements IAuthService {
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user: userRecord,
         });
-
+        this.logger.info('Success registerUser');
         return token;
       } catch (error) {
+        this.logger.error(`Error registerUser: ${error.message}`);
         throw new Error('RegisterUser: Error jsonwebtoken');
       }
     } catch (error) {
+      this.logger.error(`Error registerUser: ${error.message}`);
       throw new Error('Error registerUser');
     }
   }

@@ -41,6 +41,13 @@ export const authRoutes = (appRouter: Router) => {
       res: Response,
       next: NextFunction,
     ): Promise<void> => {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
+
       try {
         const authService = Container.get(AuthService);
         const token = await authService.loginUser(req.user);
@@ -74,7 +81,6 @@ export const authRoutes = (appRouter: Router) => {
 
       if (!errors.isEmpty) {
         res.status(400).json({ errors: errors.array() });
-        next();
         return;
       }
 

@@ -17,7 +17,7 @@ export const auth = (
 
   const jwtSecret = config.jwtSecret;
   try {
-    const decoded = jwt.verify(token, jwtSecret);
+    const decoded = jwt.verify(token, jwtSecret) as RequestUser;
     req.user = decoded.user;
     next();
   } catch (err) {

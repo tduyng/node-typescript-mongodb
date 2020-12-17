@@ -7,7 +7,7 @@ if (envFound.error) {
 }
 
 export const config = {
-  port: process.env.PORT || 5001,
+  port: process.env.PORT || 5000,
   dbUrl: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   jwtAlgorithm: process.env.JWT_ALGO,

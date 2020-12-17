@@ -18,7 +18,7 @@ export default class UserSubscriber {
    * then save the latest in Redis/Memcache or something similar
    */
   @On(AppEvents.user.signIn)
-  public onUserSignIn({ _id }: Partial<IUser>) {
+  public onUserSignIn({ id }: Partial<IUser>) {
     const Logger: Logger = Container.get('logger');
 
     try {
@@ -26,7 +26,7 @@ export default class UserSubscriber {
         IUser & mongoose.Document
       >;
 
-      UserModel.update({ _id }, { $set: { lastLogin: new Date() } });
+      UserModel.update({ id }, { $set: { lastLogin: new Date() } });
     } catch (e) {
       Logger.error(`🔥 Error on event ${AppEvents.user.signIn}: %o`, e);
 
