@@ -1,9 +1,9 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { RequestUser } from 'src/@types/users';
+import { RequestUser } from 'src/types/users';
 import { config } from 'src/config';
 
-export const auth = (
+export const userAuth = (
   req: RequestUser,
   res: Response,
   next: NextFunction,
@@ -11,7 +11,9 @@ export const auth = (
   const token = req.header('x-auth-token');
   if (!token) {
     res.status(401).json({
-      msg: 'No token, authorization denied',
+      error: {
+        message: 'No token, authorization denied',
+      },
     });
   }
 
@@ -21,6 +23,10 @@ export const auth = (
     req.user = decoded.user;
     next();
   } catch (err) {
-    res.status(401).json({ msg: 'Token is not valid' });
+    res.status(401).json({
+      error: {
+        message: 'Token is not valid',
+      },
+    });
   }
 };
