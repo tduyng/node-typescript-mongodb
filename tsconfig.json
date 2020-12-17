@@ -7,7 +7,7 @@
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./src/@types"
+      "src/types"
     ],
     "module": "commonjs",
     "pretty": true,
@@ -37,10 +37,10 @@
     "baseUrl": "."
   },
   "include": [
-    "./src/**/*"
+    "src"
   ],
   "exclude": [
     "node_modules",
-    "tests"
+    "test"
   ]
 }
