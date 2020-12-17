@@ -4,9 +4,9 @@ import { middleware } from 'src/middleware';
 import { AuthService } from 'src/services/auth';
 import { check, validationResult } from 'express-validator';
 import { Container } from 'typedi';
-import { Logger } from 'winston';
 import { config } from 'src/config';
 import handler from 'express-async-handler';
+import { loggerDev } from 'src/utils/logger';
 
 const authRouter = Router();
 
@@ -17,15 +17,14 @@ authRouter.get(
   '/',
   middleware.userAuth,
   handler(async (req: RequestUser, res: Response) => {
-    const logger: Logger = Container.get('logger');
-    logger.debug(`Calling GET route ${config.api.prefix}/auth`);
+    loggerDev.debug(`Calling GET route ${config.api.prefix}/auth`);
     try {
       // user.req always get from middleware
       const authService = Container.get(AuthService);
       const user = await authService.getUser(req.user.id);
       res.json(user);
     } catch (error) {
-      logger.error('Error route getUser', error.message);
+      loggerDev.error('Error route getUser', error.message);
     }
   }),
 );
@@ -40,8 +39,7 @@ authRouter.post(
   ],
   handler(
     async (req: RequestUser, res: Response): Promise<void> => {
-      const logger: Logger = Container.get('logger');
-      logger.debug(`Calling POST route ${config.api.prefix}/auth`);
+      loggerDev.debug(`Calling POST route ${config.api.prefix}/auth`);
       const errors = validationResult(req);
 
       if (!errors.isEmpty) {
@@ -76,10 +74,8 @@ authRouter.post(
   ],
   handler(
     async (req: RequestUser, res: Response): Promise<void> => {
-      const logger: Logger = Container.get('logger');
-      logger.debug(`Calling POST route ${config.api.prefix}/auth/users`);
+      loggerDev.debug(`Calling POST route ${config.api.prefix}/auth/users`);
       const errors = validationResult(req);
-
       if (!errors.isEmpty) {
         res.status(400).json({ errors: errors.array() });
         return;

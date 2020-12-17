@@ -2,7 +2,6 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import { appRouter } from 'src/routes';
 import { config } from 'src/config';
-//import { ExpressError } from 'src/@types/express';
 import helmet from 'helmet';
 import { middleware } from 'src/middleware';
 

@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { RequestUser } from 'src/types/users';
 import { config } from 'src/config';
+import httpStatus from 'http-status-codes';
 
 export const userAuth = (
   req: RequestUser,
@@ -23,7 +24,7 @@ export const userAuth = (
     req.user = decoded.user;
     next();
   } catch (err) {
-    res.status(401).json({
+    res.status(httpStatus.BAD_REQUEST).json({
       error: {
         message: 'Token is not valid',
       },

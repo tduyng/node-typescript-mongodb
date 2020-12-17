@@ -10,22 +10,21 @@ import {
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import { Logger } from 'winston';
+import httpStatus from 'http-status-codes';
+import createError from 'http-errors';
+import { logger } from 'src/utils/logger';
 
 interface IAuthService {
   getUser: (id: string) => Promise<IUser>;
   loginUser: (userInput: IUserInput) => Promise<any>;
   registerUser: (userInput: IUserInput) => Promise<any>;
 }
-
 @Service()
 export class AuthService implements IAuthService {
   constructor(
     @Inject('userModel')
     private userModel: mongoose.Model<IUser & mongoose.Document>,
     private mailer: MailerService,
-    @Inject('logger')
-    private logger: Logger,
     @EventDispatcher()
     private eventDispatcher: EventDispatcherInterface,
   ) {}
@@ -33,11 +32,9 @@ export class AuthService implements IAuthService {
   public async getUser(id: string): Promise<IUser> {
     try {
       const user = await this.userModel.findById(id).select('-password');
-      this.logger.info('Success getUser');
       return user;
     } catch (error) {
-      this.logger.error(`Error getUser: ${error.message}`);
-      throw new Error('Can not get user!');
+      throw createError(httpStatus.NOT_FOUND, `User ${id} doesn't exist`);
     }
   }
 
@@ -48,14 +45,14 @@ export class AuthService implements IAuthService {
         (await this.userModel.findOne({ username: userInput.username })) ||
         (await this.userModel.findOne({ email: userInput.email }));
       if (!user) {
-        this.logger.debug('Warning loginUser: InValid credentials');
-        throw new Error('Invalid  credentials');
+        logger.debug('Warning loginUser: InValid credentials');
+        throw createError(httpStatus.FORBIDDEN, `Invalid  credentials`);
       }
       // Check password
       const isMatch = await bcrypt.compare(userInput.password, user.password);
       if (!isMatch) {
-        this.logger.debug('Warning loginUser: InValid credentials');
-        throw new Error('Invalid credentials');
+        logger.debug('Warning loginUser: InValid credentials');
+        throw createError(httpStatus.FORBIDDEN, `Invalid  credentials`);
       }
 
       //Return jsonwebtoken
@@ -71,12 +68,12 @@ export class AuthService implements IAuthService {
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user,
         });
-        this.logger.info('Success loginUser');
+        logger.info('Success loginUser');
         return token;
       });
     } catch (error) {
-      this.logger.error(`Error loginUser: ${error.message}`);
-      throw new Error('Error login user!');
+      logger.error(`Error loginUser: ${error.message}`);
+      throw createError(httpStatus.FORBIDDEN, `Error login user!`);
     }
   }
 
@@ -88,8 +85,11 @@ export class AuthService implements IAuthService {
         (await this.userModel.findOne({ email }));
 
       if (user) {
-        this.logger.debug('Warning registerUser: User existed already');
-        throw new Error('User existed already');
+        logger.debug('Warning registerUser: User existed already');
+        throw createError(
+          httpStatus.CONFLICT,
+          `A user with username ${username} or email ${email} already exists`,
+        );
       }
       // Encrypting password
       const salt = await bcrypt.genSalt(10);
@@ -112,15 +112,18 @@ export class AuthService implements IAuthService {
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user: userRecord,
         });
-        this.logger.info('Success registerUser');
+        logger.info('Success registerUser');
         return token;
       } catch (error) {
-        this.logger.error(`Error registerUser: ${error.message}`);
-        throw new Error('RegisterUser: Error jsonwebtoken');
+        logger.error(`Error registerUser: ${error.message}`);
+        throw createError(
+          httpStatus.FORBIDDEN,
+          `RegisterUser: Error jsonwebtoken`,
+        );
       }
     } catch (error) {
-      this.logger.error(`Error registerUser: ${error.message}`);
-      throw new Error('Error registerUser');
+      logger.error(`Error registerUser: ${error.message}`);
+      throw createError(httpStatus.FORBIDDEN, `Error registerUser`);
     }
   }
 }
