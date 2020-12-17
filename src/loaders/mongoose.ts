@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { config } from 'src/config';
-import { Logger } from './logger';
+import { logger } from '../utils/logger';
 export const connectDb = async (): Promise<void> => {
   const db = config.dbUrl;
   try {
@@ -10,9 +10,9 @@ export const connectDb = async (): Promise<void> => {
       useUnifiedTopology: true,
       useCreateIndex: true,
     });
-    Logger.info('MongoDB has been connected');
+    logger.info('MongoDB has been connected');
   } catch (err) {
-    Logger.error(err.message);
+    logger.error(err.message);
     process.exit(1);
   }
 };

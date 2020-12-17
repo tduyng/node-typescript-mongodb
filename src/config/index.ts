@@ -10,7 +10,6 @@ export const config = {
   port: process.env.PORT || 5000,
   dbUrl: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
-  jwtAlgorithm: process.env.JWT_ALGO,
   logs: {
     // Used by winston logger
     level: process.env.LOG_LEVEL || 'silly',
@@ -35,3 +34,10 @@ export const config = {
     domain: process.env.MAILGUN_DOMAIN,
   },
 };
+
+export enum MODES {
+  TEST = 'test',
+  LOCAL = 'local',
+  DEV = 'development',
+  PROD = 'production',
+}

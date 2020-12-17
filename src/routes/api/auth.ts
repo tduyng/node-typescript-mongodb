@@ -1,21 +1,22 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { IUserInput, RequestUser } from 'src/@types/users';
+import { Router, Response } from 'express';
+import { IUserInput, RequestUser } from 'src/types/users';
 import { middleware } from 'src/middleware';
 import { AuthService } from 'src/services/auth';
 import { check, validationResult } from 'express-validator';
 import { Container } from 'typedi';
 import { Logger } from 'winston';
 import { config } from 'src/config';
+import handler from 'express-async-handler';
 
-const router = Router();
+const authRouter = Router();
 
-export const authRoutes = (appRouter: Router) => {
-  appRouter.use('/auth', router);
+// @GET '/auth'
+// @DEST Get user authenticated
 
-  // @GET '/auth'
-  // @DEST Get user authenticated
-
-  router.get('/', middleware.auth, async (req: RequestUser, res: Response) => {
+authRouter.get(
+  '/',
+  middleware.userAuth,
+  handler(async (req: RequestUser, res: Response) => {
     const logger: Logger = Container.get('logger');
     logger.debug(`Calling GET route ${config.api.prefix}/auth`);
     try {
@@ -26,16 +27,18 @@ export const authRoutes = (appRouter: Router) => {
     } catch (error) {
       logger.error('Error route getUser', error.message);
     }
-  });
+  }),
+);
 
-  // @POST '/auth'
-  // @DES Login user
-  router.post(
-    '/',
-    [
-      check('username', 'Username is required').not().isEmpty(),
-      check('password', 'Please enter your password').not().isEmpty(),
-    ],
+// @POST '/auth'
+// @DES Login user
+authRouter.post(
+  '/',
+  [
+    check('username', 'Username is required').not().isEmpty(),
+    check('password', 'Please enter your password').not().isEmpty(),
+  ],
+  handler(
     async (req: RequestUser, res: Response): Promise<void> => {
       const logger: Logger = Container.get('logger');
       logger.debug(`Calling POST route ${config.api.prefix}/auth`);
@@ -55,21 +58,23 @@ export const authRoutes = (appRouter: Router) => {
         res.status(500).json({ errors: error });
       }
     },
-  );
+  ),
+);
 
-  // @POST '/auth/users'
-  // @DES Register user
-  router.post(
-    '/users',
-    // Using express-validator to check form input
-    [
-      check('username', 'Username is required').not().isEmpty(),
-      check('email', 'Please a valid email').isEmail(),
-      check(
-        'password',
-        'Please enter a password with 3 or more characters',
-      ).isLength({ min: 3 }),
-    ],
+// @POST '/auth/users'
+// @DES Register user
+authRouter.post(
+  '/users',
+  // Using express-validator to check form input
+  [
+    check('username', 'Username is required').not().isEmpty(),
+    check('email', 'Please a valid email').isEmail(),
+    check(
+      'password',
+      'Please enter a password with 3 or more characters',
+    ).isLength({ min: 3 }),
+  ],
+  handler(
     async (req: RequestUser, res: Response): Promise<void> => {
       const logger: Logger = Container.get('logger');
       logger.debug(`Calling POST route ${config.api.prefix}/auth/users`);
@@ -89,5 +94,8 @@ export const authRoutes = (appRouter: Router) => {
         res.status(500).json({ errors: error });
       }
     },
-  );
-};
+  ),
+);
+
+export { authRouter };
+export default authRouter;

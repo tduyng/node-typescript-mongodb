@@ -2,12 +2,12 @@ import { Service, Inject } from 'typedi';
 import { AppEvents } from 'src/subscribers/event';
 import { MailerService } from 'src/services/mailer';
 import { config } from 'src/config';
-import { IUser, RequestUser, IUserInput } from 'src/@types/users';
+import { IUser, IUserInput } from 'src/types/users';
 import {
   EventDispatcher,
   EventDispatcherInterface,
 } from 'src/decorators/eventDispatcher';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { Logger } from 'winston';
@@ -33,7 +33,7 @@ export class AuthService implements IAuthService {
   public async getUser(id: string): Promise<IUser> {
     try {
       const user = await this.userModel.findById(id).select('-password');
-      this.logger.info('Succes getUser');
+      this.logger.info('Success getUser');
       return user;
     } catch (error) {
       this.logger.error(`Error getUser: ${error.message}`);
@@ -107,7 +107,7 @@ export class AuthService implements IAuthService {
       };
       const jwtSecret = config.jwtSecret;
       try {
-        const token = await jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
         await this.mailer.SendWelcomeEmail(userRecord.email);
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user: userRecord,

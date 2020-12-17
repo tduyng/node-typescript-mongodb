@@ -1,13 +1,17 @@
 import { Router, Response } from 'express';
-import { RequestUser } from 'src/@types/users';
+import { RequestUser } from 'src/types/users';
 import { middleware } from 'src/middleware';
+import handler from 'express-async-handler';
 
-const router = Router();
+const userRouter = Router();
 
-export const userRoutes = (appRouter: Router) => {
-  appRouter.use('/users', router);
-
-  router.get('/me', middleware.auth, (req: RequestUser, res: Response) => {
+userRouter.get(
+  '/me',
+  middleware.userAuth,
+  handler(async (req: RequestUser, res: Response) => {
     return res.status(200).json({ user: req.user });
-  });
-};
+  }),
+);
+
+export { userRouter };
+export default userRouter;

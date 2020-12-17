@@ -1,4 +1,4 @@
-import { IUser } from 'src/@types/users';
+import { IUser } from 'src/types/users';
 import { Service, Inject } from 'typedi';
 import { Logger } from 'winston';
 import { Container } from 'typedi';
