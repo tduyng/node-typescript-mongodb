@@ -80,7 +80,6 @@ export class UserService implements IUserService {
 
   public async registerUser(userInput: IUserInput) {
     const { username, email, password } = userInput;
-    console.log('User Input', userInput);
     try {
       let user = await this.userModel.findOne({ username });
 

@@ -21,9 +21,14 @@ export class MailerService {
       text: 'Sending with SENDGRID is fun!',
       html: '<strong>and easy to do anywhere, even with Node.js</strong>',
     };
-    this.emailClient.send(msg).then(() => {
-      this.Logger.info(`An email has been send to ${email}`);
-    });
+    this.emailClient
+      .send(msg)
+      .then(() => {
+        this.Logger.info(`An email has been send to ${email}`);
+      })
+      .catch(error => {
+        this.Logger.error(`Sendgrid: ${error}`);
+      });
 
     return { delivered: 1, status: 'ok' };
   }
