@@ -10,7 +10,7 @@ import {
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import Logger from 'winston';
+import { Logger } from 'winston';
 
 interface IAuthService {
   getUser: (id: string) => Promise<IUser>;
@@ -25,7 +25,7 @@ export class AuthService implements IAuthService {
     private userModel: mongoose.Model<IUser & mongoose.Document>,
     private mailer: MailerService,
     @Inject('logger')
-    private logger,
+    private logger: Logger,
     @EventDispatcher()
     private eventDispatcher: EventDispatcherInterface,
   ) {}

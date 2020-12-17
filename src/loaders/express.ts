@@ -4,6 +4,7 @@ import cors from 'cors';
 import { routes } from 'src/routes';
 import { config } from 'src/config';
 import { ExpressError } from 'src/@types/express';
+import { Logger } from './logger';
 
 export const expressLoader = (app: Application) => {
   /**
@@ -35,8 +36,9 @@ export const expressLoader = (app: Application) => {
   app.use(require('method-override')());
   app.use(express.json());
 
-  // Load API routes
+  // Load API routes and using prefix route
   app.use(config.api.prefix, routes());
+  Logger.debug(`Prefix route: ${config.api.prefix}`);
 
   /// catch 404 and forward to error handler
   app.use((req, res, next) => {

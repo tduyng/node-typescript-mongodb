@@ -4,6 +4,8 @@ import { middleware } from 'src/middleware';
 import { AuthService } from 'src/services/auth';
 import { check, validationResult } from 'express-validator';
 import { Container } from 'typedi';
+import { Logger } from 'winston';
+import { config } from 'src/config';
 
 const router = Router();
 
@@ -13,20 +15,18 @@ export const authRoutes = (appRouter: Router) => {
   // @GET '/auth'
   // @DEST Get user authenticated
 
-  router.get(
-    '/',
-    middleware.auth,
-    async (req: RequestUser, res: Response, next: NextFunction) => {
-      try {
-        // user.req always get from middleware
-        const authService = Container.get(AuthService);
-        const user = await authService.getUser(req.user.id);
-        res.json(user);
-      } catch (error) {
-        next();
-      }
-    },
-  );
+  router.get('/', middleware.auth, async (req: RequestUser, res: Response) => {
+    const logger: Logger = Container.get('logger');
+    logger.debug(`Calling GET route ${config.api.prefix}/auth`);
+    try {
+      // user.req always get from middleware
+      const authService = Container.get(AuthService);
+      const user = await authService.getUser(req.user.id);
+      res.json(user);
+    } catch (error) {
+      logger.error('Error route getUser', error.message);
+    }
+  });
 
   // @POST '/auth'
   // @DES Login user
@@ -36,11 +36,9 @@ export const authRoutes = (appRouter: Router) => {
       check('username', 'Username is required').not().isEmpty(),
       check('password', 'Please enter your password').not().isEmpty(),
     ],
-    async (
-      req: RequestUser,
-      res: Response,
-      next: NextFunction,
-    ): Promise<void> => {
+    async (req: RequestUser, res: Response): Promise<void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug(`Calling POST route ${config.api.prefix}/auth`);
       const errors = validationResult(req);
 
       if (!errors.isEmpty) {
@@ -50,11 +48,11 @@ export const authRoutes = (appRouter: Router) => {
 
       try {
         const authService = Container.get(AuthService);
-        const token = await authService.loginUser(req.user);
+        const token = await authService.loginUser(req.body);
+
         res.json({ token });
       } catch (error) {
         res.status(500).json({ errors: error });
-        next();
       }
     },
   );
@@ -72,11 +70,9 @@ export const authRoutes = (appRouter: Router) => {
         'Please enter a password with 3 or more characters',
       ).isLength({ min: 3 }),
     ],
-    async (
-      req: RequestUser,
-      res: Response,
-      next: NextFunction,
-    ): Promise<void> => {
+    async (req: RequestUser, res: Response): Promise<void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug(`Calling POST route ${config.api.prefix}/auth/users`);
       const errors = validationResult(req);
 
       if (!errors.isEmpty) {
@@ -91,7 +87,6 @@ export const authRoutes = (appRouter: Router) => {
         res.json({ token });
       } catch (error) {
         res.status(500).json({ errors: error });
-        next();
       }
     },
   );
