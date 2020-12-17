@@ -1,7 +1,8 @@
-import { IUser } from 'src/types/users';
+import { IUser } from 'src/types/user';
 import { Service, Inject } from 'typedi';
 import { Logger } from 'winston';
 import { Container } from 'typedi';
+import { config } from 'src/config';
 
 @Service()
 export class MailerService {
@@ -12,14 +13,17 @@ export class MailerService {
      * @TODO Call Mailchip/ Sendgrid or whaterver mail service
      */
 
-    // Add example for sending mail from mailgun
-    const data = {
-      from: 'Excited User <me@sample.mailgun.org>',
+    // Add example for sending mail from sendgrid
+    const msg = {
+      from: config.emails.sender,
       to: email,
-      subject: 'Hello',
-      text: 'Testing from Mailgun awesome!',
+      subject: 'Welcome to our page',
+      text: 'Sending with SENDGRID is fun!',
+      html: '<strong>and easy to do anywhere, even with Node.js</strong>',
     };
-    this.emailClient.messages().send(data);
+    this.emailClient.send(msg).then(() => {
+      this.Logger.info(`An email has been send to ${email}`);
+    });
 
     return { delivered: 1, status: 'ok' };
   }

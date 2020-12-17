@@ -2,7 +2,7 @@ import { Service, Inject } from 'typedi';
 import { AppEvents } from 'src/subscribers/event';
 import { MailerService } from 'src/services/mailer';
 import { config } from 'src/config';
-import { IUser, IUserInput } from 'src/types/users';
+import { IUser, IUserInput, IUserService } from 'src/types/user';
 import {
   EventDispatcher,
   EventDispatcherInterface,
@@ -12,19 +12,16 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import httpStatus from 'http-status-codes';
 import createError from 'http-errors';
-import { logger } from 'src/utils/logger';
+import { Logger } from 'winston';
 
-interface IAuthService {
-  getUser: (id: string) => Promise<IUser>;
-  loginUser: (userInput: IUserInput) => Promise<any>;
-  registerUser: (userInput: IUserInput) => Promise<any>;
-}
+/* User service */
 @Service()
-export class AuthService implements IAuthService {
+export class UserService implements IUserService {
   constructor(
     @Inject('userModel')
     private userModel: mongoose.Model<IUser & mongoose.Document>,
     private mailer: MailerService,
+    @Inject('logger') private logger: Logger,
     @EventDispatcher()
     private eventDispatcher: EventDispatcherInterface,
   ) {}
@@ -45,13 +42,13 @@ export class AuthService implements IAuthService {
         (await this.userModel.findOne({ username: userInput.username })) ||
         (await this.userModel.findOne({ email: userInput.email }));
       if (!user) {
-        logger.debug('Warning loginUser: InValid credentials');
+        this.logger.debug('Warning loginUser: InValid credentials');
         throw createError(httpStatus.FORBIDDEN, `Invalid  credentials`);
       }
       // Check password
       const isMatch = await bcrypt.compare(userInput.password, user.password);
       if (!isMatch) {
-        logger.debug('Warning loginUser: InValid credentials');
+        this.logger.debug('Warning loginUser: InValid credentials');
         throw createError(httpStatus.FORBIDDEN, `Invalid  credentials`);
       }
 
@@ -68,62 +65,71 @@ export class AuthService implements IAuthService {
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user,
         });
-        logger.info('Success loginUser');
+        this.logger.info('Success loginUser');
         return token;
       });
     } catch (error) {
-      logger.error(`Error loginUser: ${error.message}`);
-      throw createError(httpStatus.FORBIDDEN, `Error login user!`);
+      this.logger.error(`Error loginUser: ${error.message}`);
+      throw error;
     }
   }
 
   public async registerUser(userInput: IUserInput) {
     const { username, email, password } = userInput;
+    console.log('User Input', userInput);
     try {
-      const user =
-        (await this.userModel.findOne({ username })) ||
-        (await this.userModel.findOne({ email }));
+      let user = await this.userModel.findOne({ username });
 
       if (user) {
-        logger.debug('Warning registerUser: User existed already');
         throw createError(
           httpStatus.CONFLICT,
-          `A user with username ${username} or email ${email} already exists`,
+          `A user with username ${username} already exists`,
         );
       }
+      console.log('go1');
+      user = await this.userModel.findOne({ email });
+      if (user) {
+        throw createError(
+          httpStatus.CONFLICT,
+          `A user with email ${email} already exists`,
+        );
+      }
+      console.log('go2');
       // Encrypting password
       const salt = await bcrypt.genSalt(10);
       const encryptPass = await bcrypt.hash(password, salt);
       const userRecord = await this.userModel.create({
-        username,
-        email,
+        username: username,
+        email: email,
         password: encryptPass,
       });
+
       // Return password
       const payload = {
         user: {
-          id: user.id,
+          id: userRecord.id,
         },
       };
       const jwtSecret = config.jwtSecret;
       try {
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
         await this.mailer.SendWelcomeEmail(userRecord.email);
+        console.log('go here');
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user: userRecord,
         });
-        logger.info('Success registerUser');
+        this.logger.info('Success registerUser');
         return token;
       } catch (error) {
-        logger.error(`Error registerUser: ${error.message}`);
+        this.logger.error(`Error registerUser: ${error.message}`);
         throw createError(
           httpStatus.FORBIDDEN,
           `RegisterUser: Error jsonwebtoken`,
         );
       }
     } catch (error) {
-      logger.error(`Error registerUser: ${error.message}`);
-      throw createError(httpStatus.FORBIDDEN, `Error registerUser`);
+      this.logger.error(`Error registerUser: ${error.message}`);
+      throw error;
     }
   }
 }

@@ -3,7 +3,7 @@ import { EventSubscriber, On } from 'event-dispatch';
 import mongoose from 'mongoose';
 import { Logger } from 'winston';
 import { AppEvents } from './event';
-import { IUser } from 'src/types/users';
+import { IUser } from 'src/types/user';
 
 @EventSubscriber()
 export default class UserSubscriber {

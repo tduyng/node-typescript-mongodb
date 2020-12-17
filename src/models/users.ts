@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IUser } from 'src/types/users';
+import { IUser } from 'src/types/user';
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
@@ -27,17 +27,7 @@ const UserSchema = new Schema(
   { timestamps: true },
 );
 
-UserSchema.path('email').validate(function (email) {
-  const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-  return emailRegex.test(email.text); // Assuming email has a text attribute
-}, 'Email field cannot be empty.');
+const UserModel = mongoose.model<IUser & mongoose.Document>('user', UserSchema);
 
-UserSchema.path('username').validate(function (username) {
-  const usernameRegex = /^(\s)?$/;
-  return usernameRegex.test(username.text); // Assuming username has a text attribute
-}, 'User field cannot be empty.');
-
-export const UserModel = mongoose.model<IUser & mongoose.Document>(
-  'user',
-  UserSchema,
-);
+export { UserModel };
+export default UserModel;

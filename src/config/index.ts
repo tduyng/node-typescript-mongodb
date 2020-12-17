@@ -29,9 +29,9 @@ export const config = {
     prefix: '/api',
   },
   emails: {
-    // Mailgun email credentials
-    apiKey: process.env.MAILGUN_API_KEY,
-    domain: process.env.MAILGUN_DOMAIN,
+    // SENDGRID email credentials
+    apiKey: process.env.SENDGRID_API_KEY,
+    sender: process.env.SENDGRID_SENDER,
   },
 };
 
