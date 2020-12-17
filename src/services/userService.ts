@@ -60,14 +60,18 @@ export class UserService implements IUserService {
       };
 
       const jwtSecret = config.jwtSecret;
-      jwt.sign(payload, jwtSecret, { expiresIn: '1h' }, (err, token) => {
-        if (err) throw new Error('LoginUser: Error jsonwebtoken');
-        this.eventDispatcher.dispatch(AppEvents.user.signUp, {
+      try {
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
+        this.eventDispatcher.dispatch(AppEvents.user.signIn, {
           user,
         });
-        this.logger.info('Success loginUser');
         return token;
-      });
+      } catch (error) {
+        throw createError(
+          httpStatus.FORBIDDEN,
+          `loginUser: Error jsonwebtoken`,
+        );
+      }
     } catch (error) {
       this.logger.error(`Error loginUser: ${error.message}`);
       throw error;
@@ -86,7 +90,6 @@ export class UserService implements IUserService {
           `A user with username ${username} already exists`,
         );
       }
-      console.log('go1');
       user = await this.userModel.findOne({ email });
       if (user) {
         throw createError(
@@ -94,7 +97,6 @@ export class UserService implements IUserService {
           `A user with email ${email} already exists`,
         );
       }
-      console.log('go2');
       // Encrypting password
       const salt = await bcrypt.genSalt(10);
       const encryptPass = await bcrypt.hash(password, salt);
@@ -114,7 +116,6 @@ export class UserService implements IUserService {
       try {
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
         await this.mailer.SendWelcomeEmail(userRecord.email);
-        console.log('go here');
         this.eventDispatcher.dispatch(AppEvents.user.signUp, {
           user: userRecord,
         });

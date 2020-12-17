@@ -38,7 +38,7 @@ export class UserSignupDto {
 }
 
 export class UserSigninDto {
-  @IsEmail()
+  @IsString()
   username: string;
 
   @IsString()
