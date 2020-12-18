@@ -4,8 +4,9 @@ import { appRouter } from 'src/routes';
 import { config } from 'src/config';
 import helmet from 'helmet';
 import { middleware } from 'src/middleware';
+import { agendashRouterDirect } from 'src/routes/agendash';
 
-export const expressLoader = (app: Application) => {
+export const expressLoader = async (app: Application) => {
   /**
    * Health Check endpoints
    * @TODO Explain why they are here
@@ -32,6 +33,7 @@ export const expressLoader = (app: Application) => {
 
   /*  Routes  */
   app.use(config.api.prefix, appRouter);
+  agendashRouterDirect(app);
 
   /*  404 middleware  */
   app.use(middleware.notFound);

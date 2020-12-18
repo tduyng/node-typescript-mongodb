@@ -9,10 +9,6 @@ export class MailerService {
   constructor(@Inject('emailClient') private emailClient) {}
   Logger: Logger = Container.get('logger');
   public async SendWelcomeEmail(email: string) {
-    /*
-     * @TODO Call Mailchip/ Sendgrid or whaterver mail service
-     */
-
     // Add example for sending mail from sendgrid
     const msg = {
       from: config.emails.sender,

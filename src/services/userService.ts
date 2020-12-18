@@ -38,15 +38,18 @@ export class UserService implements IUserService {
   public async loginUser(userInput: IUserInput) {
     try {
       // Get user from db
-      const user =
+      const userCheck =
         (await this.userModel.findOne({ username: userInput.username })) ||
         (await this.userModel.findOne({ email: userInput.email }));
-      if (!user) {
+      if (!userCheck) {
         this.logger.debug('Warning loginUser: InValid credentials');
         throw createError(httpStatus.FORBIDDEN, `Invalid  credentials`);
       }
       // Check password
-      const isMatch = await bcrypt.compare(userInput.password, user.password);
+      const isMatch = await bcrypt.compare(
+        userInput.password,
+        userCheck.password,
+      );
       if (!isMatch) {
         this.logger.debug('Warning loginUser: InValid credentials');
         throw createError(httpStatus.FORBIDDEN, `Invalid  credentials`);
@@ -55,16 +58,14 @@ export class UserService implements IUserService {
       //Return jsonwebtoken
       const payload = {
         user: {
-          id: user.id,
+          id: userCheck.id,
         },
       };
 
       const jwtSecret = config.jwtSecret;
       try {
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
-        this.eventDispatcher.dispatch(AppEvents.user.signIn, {
-          user,
-        });
+        this.eventDispatcher.dispatch(AppEvents.user.signIn, userCheck);
         return token;
       } catch (error) {
         throw createError(
@@ -115,9 +116,7 @@ export class UserService implements IUserService {
       try {
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '2h' });
         await this.mailer.SendWelcomeEmail(userRecord.email);
-        this.eventDispatcher.dispatch(AppEvents.user.signUp, {
-          user: userRecord,
-        });
+        this.eventDispatcher.dispatch(AppEvents.user.signUp, userRecord);
         this.logger.info('Success registerUser');
         return token;
       } catch (error) {

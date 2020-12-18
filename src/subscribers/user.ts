@@ -8,7 +8,7 @@ import { IUser } from 'src/types/user';
 @EventSubscriber()
 export default class UserSubscriber {
   /**
-   * A great example of an event that you want to handle
+   * A example
    * save the last time a user signin, your boss will be pleased.
    *
    * Altough it works in this tiny toy API, please don't do this for a production product
@@ -18,15 +18,16 @@ export default class UserSubscriber {
    * then save the latest in Redis/Memcache or something similar
    */
   @On(AppEvents.user.signIn)
-  public onUserSignIn({ id }: Partial<IUser>) {
+  public async onUserSignIn({ id, username }: Partial<IUser>) {
     const Logger: Logger = Container.get('logger');
 
     try {
-      const UserModel = Container.get('UserModel') as mongoose.Model<
+      const UserModel = Container.get('userModel') as mongoose.Model<
         IUser & mongoose.Document
       >;
 
       UserModel.update({ id }, { $set: { lastLogin: new Date() } });
+      Logger.info(`======> User '${username}' has been connected`);
     } catch (e) {
       Logger.error(`🔥 Error on event ${AppEvents.user.signIn}: %o`, e);
 
@@ -36,7 +37,7 @@ export default class UserSubscriber {
   }
 
   @On(AppEvents.user.signUp)
-  public onUserSignUp({ username, email }: Partial<IUser>) {
+  public async onUserSignUp({ username, email }: Partial<IUser>) {
     const Logger: Logger = Container.get('logger');
 
     try {
@@ -48,6 +49,9 @@ export default class UserSubscriber {
       // TrackerService.track('user.signup', { email, _id })
       // Start your email sequence or whatever
       // MailService.startSequence('user.welcome', { email, name })
+      Logger.info(
+        `======> New user has been registered: ${username} - ${email}`,
+      );
     } catch (e) {
       Logger.error(`🔥 Error on event ${AppEvents.user.signUp}: %o`, e);
 
