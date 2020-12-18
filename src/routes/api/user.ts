@@ -15,6 +15,7 @@ const { validation } = middleware;
 userRouter.get(
   '/',
   middleware.userAuth,
+  middleware.checkObjectId,
   handler(async (req: RequestUser, res: Response) => {
     // user.req always get from middleware
     const userService = Container.get(UserService);
