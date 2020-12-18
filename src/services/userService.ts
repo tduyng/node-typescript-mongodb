@@ -26,6 +26,7 @@ export class UserService implements IUserService {
     private eventDispatcher: EventDispatcherInterface,
   ) {}
 
+  /* Get user from id*/
   public async getUser(id: string): Promise<IUser> {
     try {
       const user = await this.userModel.findById(id).select('-password');
@@ -34,6 +35,8 @@ export class UserService implements IUserService {
       throw createError(httpStatus.NOT_FOUND, `User ${id} doesn't exist`);
     }
   }
+
+  /* Login user */
 
   public async loginUser(userInput: IUserInput) {
     try {
@@ -79,6 +82,7 @@ export class UserService implements IUserService {
     }
   }
 
+  /* Register user */
   public async registerUser(userInput: IUserInput) {
     const { username, email, password } = userInput;
     try {
