@@ -8,6 +8,7 @@ I use `node v14.15.1` for this project.
 
 
 ## Technology
+- Dependencies Injection with [typedi](https://github.com/typestack/typedi#readme)
 - Node, Express, Typescript
 - MongoDB, Mongoose
 - [Jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) for auth
