@@ -7,6 +7,7 @@ import { loaders } from 'src/loaders';
 const startServer = async () => {
   const app: Application = express();
   await loaders(app);
+  loggerDev.debug(`MODE ENV ${process.env.NODE_ENV}`);
   app
     .listen(config.port, () => {
       loggerDev.info(`Server listening on port: ${config.port}`);

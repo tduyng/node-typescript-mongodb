@@ -4,7 +4,6 @@ import { appRouter } from 'src/routes';
 import { config } from 'src/config';
 import helmet from 'helmet';
 import { middleware } from 'src/middleware';
-import { agendashRouterDirect } from 'src/routes/agendash';
 
 export const expressLoader = async (app: Application) => {
   /**
@@ -33,7 +32,6 @@ export const expressLoader = async (app: Application) => {
 
   /*  Routes  */
   app.use(config.api.prefix, appRouter);
-  agendashRouterDirect(app);
 
   /*  404 middleware  */
   app.use(middleware.notFound);

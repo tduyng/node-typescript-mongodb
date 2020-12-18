@@ -1,5 +1,8 @@
 import winston from 'winston';
 
+//-------------------------------------------------//
+//              LOGGER PROD                        //
+//-------------------------------------------------//
 const customFormat = winston.format.printf(args => {
   const { timestamp, level, message } = args;
   const more: Array<any> | undefined =
@@ -29,6 +32,9 @@ if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console());
 }
 
+//-------------------------------------------------//
+//              LOGGER DEV                         //
+//-------------------------------------------------//
 const transports = [];
 if (process.env.NODE_ENV !== 'development') {
   transports.push(new winston.transports.Console());
