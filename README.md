@@ -19,6 +19,7 @@ I use `node v14.15.1` for this project.
 - Eslint & Prettier
 - [express-async-handler](https://github.com/Abazhenov/express-async-handler#readme) handler async routes
 - [Winston](https://github.com/winstonjs/winston#readme) for logger
+- Dependency Injection service with [typedi](https://github.com/typestack/typedi)
 
 ## Routes
 
