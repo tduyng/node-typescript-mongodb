@@ -28,7 +28,7 @@ I use `node v14.15.1` for this project.
 
 <details>
   <summary>Click to expand!</summary>
-  
+
   ```
   ├── LICENSE
   ├── logs
@@ -87,8 +87,3 @@ I use `node v14.15.1` for this project.
   ```
 </details>
 
-
-
-## Reference
-
-- [Bulletproof-nodejs - Sam Quinn](https://github.com/santiq/bulletproof-nodejs)
